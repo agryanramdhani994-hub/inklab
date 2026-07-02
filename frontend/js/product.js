@@ -255,7 +255,12 @@ function tambahKeKeranjang(id) {
 
     localStorage.setItem("cart", JSON.stringify(cart));
 
-    alert("Produk berhasil ditambahkan ke keranjang!");
+    refreshNavbar();
+
+    showToast(
+        "Produk berhasil ditambahkan ke keranjang 🛒",
+        "success"
+    );
 
 }
 
@@ -313,6 +318,11 @@ function toggleWishlist(id){
 
         wishlist.splice(index,1);
 
+        showToast(
+            "Produk dihapus dari wishlist 💔",
+            "danger"
+        );
+
     }else{
 
         wishlist.push({
@@ -324,6 +334,11 @@ function toggleWishlist(id){
 
         });
 
+        showToast(
+            "Produk ditambahkan ke wishlist ❤️",
+            "success"
+        );
+
     }
 
     localStorage.setItem(
@@ -331,6 +346,11 @@ function toggleWishlist(id){
         JSON.stringify(wishlist)
     );
 
-    location.reload();
+    refreshNavbar();
+
+    productContainer.innerHTML =
+        products.map(createProduct).join("");
 
 }
+
+window.toggleWishlist = toggleWishlist;

@@ -1,4 +1,5 @@
 const currentUser = JSON.parse(localStorage.getItem("user"));
+let currentOrderId = null;
 
 if (!currentUser) {
     window.location.href = "login.html";
@@ -99,9 +100,11 @@ fetch(`http://localhost:5000/api/auth/profile/${currentUser.id}`)
 
             <td>
                 <button
-                    class="btn btn-sm btn-primary"
-                    onclick="lihatDetail(${order.id})">
-                    Lihat Detail
+                class="btn btn-sm btn-primary"
+                onclick="lihatDetail(${order.id},'${order.status}')">
+
+                Lihat Detail
+
                 </button>
             </td>
 
@@ -116,7 +119,15 @@ fetch(`http://localhost:5000/api/auth/profile/${currentUser.id}`)
     })
     .catch(err => console.log(err));
 
-    function lihatDetail(orderId) {
+    function lihatDetail(orderId, status) {
+
+        currentOrderId = orderId;
+
+        if(status === "pending"){
+            document.getElementById("paymentSection").style.display = "block";
+        }else{
+            document.getElementById("paymentSection").style.display = "none";
+        }
 
         fetch(`http://localhost:5000/api/orders/detail/${orderId}`)
     
@@ -251,6 +262,47 @@ fetch(`http://localhost:5000/api/auth/profile/${currentUser.id}`)
     location.reload();
 
 });
+
+});
+
+document
+.getElementById("uploadPayment")
+.addEventListener("click", () => {
+
+    const file =
+        document.getElementById("paymentFile").files[0];
+
+    if(!file){
+
+        alert("Silakan pilih file terlebih dahulu.");
+
+        return;
+
+    }
+
+    const formData = new FormData();
+
+    formData.append("payment", file);
+
+    fetch(
+        `http://localhost:5000/api/orders/upload-payment/${currentOrderId}`,
+        {
+            method:"POST",
+            body:formData
+        }
+    )
+
+    .then(res=>res.json())
+
+    .then(data=>{
+
+        alert(data.message);
+
+        location.reload();
+
+    })
+
+    .catch(err=>console.log(err));
 
 });
 

@@ -64,30 +64,46 @@ router.post("/register", (req, res) => {
 
 router.post("/login", (req, res) => {
 
+    console.log(req.body);
+
     const { email, password } = req.body;
+
+    console.log(email);
+    console.log(password);
+
+    db.query(
+        "SELECT COUNT(*) AS total FROM users",
+        (err, result) => {
+
+            console.log("Jumlah user di database:", result);
+
+        }
+    );
 
     const sql =
         "SELECT * FROM users WHERE email=? AND password=?";
 
     db.query(sql, [email, password], (err, result) => {
 
+        console.log(result);
+
         if (err) {
+            console.log(err);
             return res.status(500).json(err);
         }
 
         if (result.length > 0) {
 
             res.json({
-                success: true,
-                message: "Login berhasil",
-                user: result[0]
+                success:true,
+                user:result[0]
             });
 
         } else {
 
             res.json({
-                success: false,
-                message: "Email atau password salah"
+                success:false,
+                message:"Email atau password salah"
             });
 
         }

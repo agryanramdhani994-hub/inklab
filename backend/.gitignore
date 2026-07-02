@@ -1,0 +1,15 @@
+# Dependency
+node_modules/
+
+# Environment
+.env
+
+# Upload user
+uploads/
+
+# Log
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

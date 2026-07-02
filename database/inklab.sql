@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS inklab;
-USE inklab;
-
 -- ===========================
 -- USERS
 -- ===========================

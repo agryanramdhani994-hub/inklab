@@ -33,8 +33,6 @@ form.addEventListener("submit", async (e) => {
                 JSON.stringify(data.user)
             );
 
-            alert(data.message);
-
             if (data.user.role === "admin") {
 
                 window.location.href = "admin-dashboard.html";

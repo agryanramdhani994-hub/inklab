@@ -1,4 +1,4 @@
-fetch("http://localhost:5000/api/dashboard")
+fetch("http://localhost:5000/api/admin/dashboard")
 .then(res => res.json())
 .then(data => {
 
@@ -16,7 +16,17 @@ fetch("http://localhost:5000/api/dashboard")
         Number(data.totalPendapatan)
         .toLocaleString("id-ID");
 
+    document.getElementById("pending").innerText =
+        data.pending;
 
+    document.getElementById("processing").innerText =
+        data.processing;
+
+    document.getElementById("completed").innerText =
+        data.completed;
+
+    document.getElementById("cancelled").innerText =
+        data.cancelled;
 
     // ==========================
     // CHART
@@ -26,47 +36,68 @@ fetch("http://localhost:5000/api/dashboard")
         document
         .getElementById("dashboardChart");
 
-    new Chart(ctx,{
-
-        type:"bar",
-
-        data:{
-
-            labels:[
-                "Produk",
-                "User",
-                "Order"
-            ],
-
-            datasets:[{
-
-                label:"Jumlah",
-
-                data:[
-                    data.totalProduk,
-                    data.totalUser,
-                    data.totalOrder
-                ]
-
-            }]
-
-        },
-
-        options:{
-
-            responsive:true,
-
-            plugins:{
-
-                legend:{
-                    display:false
+        const bulan = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "Mei",
+            "Jun",
+            "Jul",
+            "Ags",
+            "Sep",
+            "Okt",
+            "Nov",
+            "Des"
+        ];
+        
+        const labelChart = data.chart.map(item =>
+            bulan[item.bulan - 1]
+        );
+        
+        const totalChart = data.chart.map(item =>
+            item.total
+        );
+        
+        new Chart(ctx, {
+        
+            type: "line",
+        
+            data: {
+        
+                labels: labelChart,
+        
+                datasets: [{
+        
+                    label: "Pendapatan",
+        
+                    data: totalChart,
+        
+                    tension: 0.3,
+        
+                    fill: false
+        
+                }]
+        
+            },
+        
+            options: {
+        
+                responsive: true,
+        
+                plugins: {
+        
+                    legend: {
+        
+                        display: true
+        
+                    }
+        
                 }
-
+        
             }
-
-        }
-
-    });
+        
+        });
 
 })
 .catch(err=>console.log(err));

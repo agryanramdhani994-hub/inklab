@@ -2,6 +2,37 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
+const multer = require("multer");
+const path = require("path");
+
+// ===============================
+// Upload Bukti Pembayaran
+// ===============================
+
+const storage = multer.diskStorage({
+
+    destination: (req, file, cb) => {
+
+        cb(null, "uploads/");
+
+    },
+
+    filename: (req, file, cb) => {
+
+        cb(
+            null,
+            Date.now() +
+            path.extname(file.originalname)
+        );
+
+    }
+
+});
+
+const upload = multer({
+    storage
+});
+
 router.get("/", (req, res) => {
 
     const sql = `
@@ -66,18 +97,28 @@ router.get("/detail/:id", (req, res) => {
 
     const id = req.params.id;
 
-    const sql = `
-        SELECT
-            oi.id,
-            p.product_name,
-            p.image,
-            oi.quantity,
-            oi.subtotal
-        FROM order_items oi
-        JOIN products p
-            ON oi.product_id = p.id
-        WHERE oi.order_id = ?
-    `;
+const sql = `
+    SELECT
+        oi.id,
+        p.product_name,
+        p.image,
+        oi.quantity,
+        oi.subtotal,
+
+        o.status,
+        o.payment_proof,
+        o.total
+
+    FROM order_items oi
+
+    JOIN products p
+        ON oi.product_id = p.id
+
+    JOIN orders o
+        ON oi.order_id = o.id
+
+    WHERE oi.order_id = ?
+`;
 
     db.query(sql, [id], (err, result) => {
 
@@ -203,5 +244,65 @@ router.put("/status/:id", (req, res) => {
     });
 
 });
+
+// ======================================
+// Upload Bukti Pembayaran
+// ======================================
+
+router.post(
+    "/upload-payment/:id",
+    upload.single("payment"),
+    (req, res) => {
+
+        const id = req.params.id;
+
+        if (!req.file) {
+
+            return res.json({
+
+                success: false,
+                message: "File belum dipilih"
+
+            });
+
+        }
+
+        const sql = `
+            UPDATE orders
+            SET
+                payment_proof = ?,
+                status = 'paid'
+            WHERE id = ?
+        `;
+
+        db.query(
+
+            sql,
+
+            [
+
+                req.file.filename,
+                id
+
+            ],
+
+            (err) => {
+
+                if (err)
+                    return res.status(500).json(err);
+
+                res.json({
+
+                    success: true,
+                    message: "Bukti pembayaran berhasil diupload."
+
+                });
+
+            }
+
+        );
+
+    }
+);
 
 module.exports = router;

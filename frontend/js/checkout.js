@@ -50,6 +50,53 @@ document
 .getElementById("buatPesanan")
 .addEventListener("click", () => {
 
+    console.log("BUTTON DIKLIK");
+
+    const btn = document.getElementById("buatPesanan");
+
+    btn.disabled = true;
+
+    btn.innerHTML = "Memproses...";
+
+    const fullname =
+document.getElementById("fullname").value;
+
+const phone =
+document.getElementById("phone").value;
+
+const address =
+document.getElementById("address").value;
+
+if(
+fullname==="" ||
+phone==="" ||
+address===""){
+    alert("Lengkapi data pengiriman.");
+    
+    btn.disabled = false;
+    btn.innerHTML = "Buat Pesanan";
+    return;
+}
+
+// ==========================
+// CEK KERANJANG
+// ==========================
+
+if(cart.length === 0){
+
+    alert("Keranjang masih kosong.");
+
+    btn.disabled = false;
+    btn.innerHTML = "Buat Pesanan";
+
+    return;
+
+}
+
+// ==========================
+// DATA PESANAN
+// ==========================
+
     const data = {
 
         user_id: user.id,
@@ -74,18 +121,35 @@ document
 
     .then(res=>res.json())
 
-    .then(result=>{
+    .then(result => {
 
         alert(result.message);
-
+    
         if(result.success){
-
+    
             localStorage.removeItem("cart");
-
-            window.location.href="profile.html";
-
+    
+            window.location.href = "profile.html";
+    
+        }else{
+    
+            btn.disabled = false;
+            btn.innerHTML = "Buat Pesanan";
+    
         }
+    
+    })
 
-    });
+    .catch(err => {
 
-});
+        console.log(err);
+    
+        alert("Server tidak dapat dihubungi.");
+    
+        btn.disabled = false;
+    
+        btn.innerHTML = "Buat Pesanan";
+    
+    });   // <-- menutup catch
+    
+    });   // <-- menutup addEventListener

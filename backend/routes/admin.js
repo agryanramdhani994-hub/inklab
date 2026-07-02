@@ -7,6 +7,30 @@ router.get("/dashboard", (req, res) => {
     const sqlProduk = "SELECT COUNT(*) AS totalProduk FROM products";
     const sqlOrder = "SELECT COUNT(*) AS totalOrder FROM orders";
     const sqlUser = "SELECT COUNT(*) AS totalUser FROM users";
+    
+    const sqlPendapatan =
+    "SELECT IFNULL(SUM(total),0) AS totalPendapatan FROM orders";
+
+    const sqlPending =
+    "SELECT COUNT(*) AS pending FROM orders WHERE status='pending'";
+
+    const sqlProcessing =
+    "SELECT COUNT(*) AS processing FROM orders WHERE status='processing'";
+
+    const sqlCompleted =
+    "SELECT COUNT(*) AS completed FROM orders WHERE status='completed'";
+
+    const sqlCancelled =
+    "SELECT COUNT(*) AS cancelled FROM orders WHERE status='cancelled'";
+
+    const sqlChart = `
+    SELECT
+        MONTH(created_at) AS bulan,
+        SUM(total) AS total
+    FROM orders
+    GROUP BY MONTH(created_at)
+    ORDER BY MONTH(created_at)
+    `;
 
     db.query(sqlProduk, (err, produk) => {
 
@@ -18,16 +42,67 @@ router.get("/dashboard", (req, res) => {
 
             db.query(sqlUser, (err, user) => {
 
-                if (err) return res.status(500).json(err);
+                if (err)
+                    return res.status(500).json(err);
+            
+                db.query(sqlPendapatan, (err, pendapatan) => {
+            
+                    if (err)
+                        return res.status(500).json(err);
 
-                res.json({
+                    db.query(sqlPending, (err, pending) => {
 
-                    totalProduk: produk[0].totalProduk,
-                    totalOrder: order[0].totalOrder,
-                    totalUser: user[0].totalUser
+                        if (err)
+                            return res.status(500).json(err);
+                    
+                        db.query(sqlProcessing, (err, processing) => {
+                    
+                            if (err)
+                                return res.status(500).json(err);
+                    
+                            db.query(sqlCompleted, (err, completed) => {
+                    
+                                if (err)
+                                    return res.status(500).json(err);
+                    
+                                db.query(sqlCancelled, (err, cancelled) => {
 
+                                    if (err)
+                                        return res.status(500).json(err);
+                                
+                                    db.query(sqlChart, (err, chart) => {
+                                
+                                        if (err)
+                                            return res.status(500).json(err);
+                                
+                                        res.json({
+                                
+                                            totalProduk: produk[0].totalProduk,
+                                            totalOrder: order[0].totalOrder,
+                                            totalUser: user[0].totalUser,
+                                            totalPendapatan: pendapatan[0].totalPendapatan,
+                                
+                                            pending: pending[0].pending,
+                                            processing: processing[0].processing,
+                                            completed: completed[0].completed,
+                                            cancelled: cancelled[0].cancelled,
+                                
+                                            chart
+                                
+                                        });
+                                
+                                    });
+                                
+                                });
+
+                            });
+                    
+                        });
+                    
+                    });
+            
                 });
-
+            
             });
 
         });
@@ -44,6 +119,7 @@ router.get("/order/:id", (req, res) => {
             users.fullname,
             orders.total,
             orders.status,
+            orders.payment_proof,
             orders.created_at,
             order_items.quantity,
             order_items.subtotal,
@@ -75,7 +151,10 @@ router.get("/order/:id", (req, res) => {
 });
 
 
-// ===== TAMBAHKAN INI =====
+// =========================
+// UPDATE STATUS ORDER
+// =========================
+
 router.put("/order/:id", (req, res) => {
 
     const id = req.params.id;
@@ -94,6 +173,7 @@ router.put("/order/:id", (req, res) => {
 
         res.json({
 
+            success: true,
             message: "Status berhasil diupdate"
 
         });
@@ -101,6 +181,49 @@ router.put("/order/:id", (req, res) => {
     });
 
 });
+
+// =========================
+// VERIFIKASI PEMBAYARAN
+// =========================
+
+router.put("/order/:id/verify", (req, res) => {
+
+    const id = req.params.id;
+
+    const sql = `
+        UPDATE orders
+        SET status = 'processing'
+        WHERE id = ?
+        AND status = 'paid'
+    `;
+
+    db.query(sql, [id], (err, result) => {
+
+        if (err)
+            return res.status(500).json(err);
+
+        if (result.affectedRows === 0) {
+
+            return res.json({
+
+                success: false,
+                message: "Pesanan tidak bisa diverifikasi."
+
+            });
+
+        }
+
+        res.json({
+
+            success: true,
+            message: "Pembayaran berhasil diverifikasi."
+
+        });
+
+    });
+
+});
+
 // =========================
 
 router.get("/users", (req, res) => {

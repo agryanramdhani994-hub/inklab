@@ -117,3 +117,88 @@ if(wishlistBadge){
     }
 
 }
+
+// ======================================
+// REFRESH NAVBAR
+// ======================================
+
+function refreshNavbar() {
+
+    console.log("refreshNavbar dipanggil");
+
+    const cartBadge =
+        document.getElementById("cartBadge");
+
+    console.log(cartBadge);
+
+    if (cartBadge) {
+
+        const cart =
+            JSON.parse(localStorage.getItem("cart")) || [];
+
+        let total = 0;
+
+        cart.forEach(item => {
+
+            total += item.jumlah;
+
+        });
+
+        cartBadge.innerText = total;
+
+        cartBadge.style.display =
+            total > 0 ? "flex" : "none";
+
+    }
+
+    // -----------------
+    // WISHLIST BADGE
+    // -----------------
+
+    const wishlistBadge =
+        document.getElementById("wishlistBadge");
+
+    if (wishlistBadge) {
+
+        const wishlist =
+            JSON.parse(localStorage.getItem("wishlist")) || [];
+
+        wishlistBadge.innerText = wishlist.length;
+
+        wishlistBadge.style.display =
+            wishlist.length > 0 ? "flex" : "none";
+
+    }
+
+}
+
+// ======================
+// TOAST
+// ======================
+
+function showToast(message, type = "success") {
+
+    const toastEl = document.getElementById("liveToast");
+    const toastBody = document.getElementById("toastMessage");
+
+    if (!toastEl || !toastBody) return;
+
+    toastBody.innerText = message;
+
+    toastEl.classList.remove(
+        "text-bg-success",
+        "text-bg-danger",
+        "text-bg-warning",
+        "text-bg-primary"
+    );
+
+    toastEl.classList.add("text-bg-" + type);
+
+    const toast = new bootstrap.Toast(toastEl);
+
+    toast.show();
+
+}
+
+window.showToast = showToast;
+window.refreshNavbar = refreshNavbar;

@@ -58,6 +58,8 @@ function tampilCart() {
         checkoutBtn.classList.remove("btn-success");
         checkoutBtn.classList.add("btn-secondary");
 
+        refreshNavbar();
+
         return;
 
     }
@@ -145,6 +147,8 @@ function tambah(index){
 
     tampilCart();
 
+    refreshNavbar();
+
 }
 
 function kurang(index){
@@ -159,6 +163,8 @@ function kurang(index){
 
     tampilCart();
 
+    refreshNavbar();
+
 }
 
 function hapus(index){
@@ -168,6 +174,8 @@ function hapus(index){
     localStorage.setItem("cart", JSON.stringify(cart));
 
     tampilCart();
+
+    refreshNavbar();
 
 }
 
