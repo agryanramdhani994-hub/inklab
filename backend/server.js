@@ -38,9 +38,9 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-console.log(
-    path.join(__dirname, "../frontend")
-);
+console.log("__dirname =", __dirname);
+console.log("frontend =", path.join(__dirname, "../frontend"));
+console.log("index =", path.join(__dirname, "../frontend/index.html"));
 
 const fs = require("fs");
 
