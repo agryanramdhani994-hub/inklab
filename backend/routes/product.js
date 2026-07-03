@@ -53,6 +53,9 @@ router.get("/", (req, res) => {
             return res.status(500).json(err);
         }
 
+        console.log("Jumlah produk:", result.length);
+        console.log(result);
+
         res.json(result);
 
     });
