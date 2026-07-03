@@ -3,12 +3,13 @@
 // ===============================
 
 const nomorAdmin = "6289662394806";
+const API_URL = window.location.origin;
 
 // ===============================
 // Ambil Produk dari Database
 // ===============================
 
-fetch("http://localhost:5000/api/products")
+fetch(`${API_URL}/api/products`)
 
 .then(res => res.json())
 
@@ -53,7 +54,7 @@ function createCard(product){
             <div class="product-image">
 
                 <img
-                    src="http://localhost:5000/uploads/${product.image}"
+                    src="${API_URL}/uploads/${product.image}"
                     alt="${product.product_name}"
                     style="
                         width:100%;
