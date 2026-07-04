@@ -126,6 +126,31 @@ router.post("/", upload.single("image"), (req, res) => {
 });
 
 // =======================
+// Ambil Semua Kategori
+// =======================
+
+router.get("/categories/all", (req, res) => {
+
+    const sql = `
+        SELECT
+            id,
+            category_name
+        FROM categories
+        ORDER BY category_name ASC
+    `;
+
+    db.query(sql, (err, result) => {
+
+        if (err)
+            return res.status(500).json(err);
+
+        res.json(result);
+
+    });
+
+});
+
+// =======================
 // Ambil 1 Produk
 // =======================
 
@@ -255,31 +280,6 @@ router.delete("/:id", (req, res) => {
             message: "Produk berhasil dihapus"
 
         });
-
-    });
-
-});
-
-// =======================
-// Ambil Semua Kategori
-// =======================
-
-router.get("/categories/all", (req, res) => {
-
-    const sql = `
-        SELECT
-            id,
-            category_name
-        FROM categories
-        ORDER BY category_name ASC
-    `;
-
-    db.query(sql, (err, result) => {
-
-        if (err)
-            return res.status(500).json(err);
-
-        res.json(result);
 
     });
 
